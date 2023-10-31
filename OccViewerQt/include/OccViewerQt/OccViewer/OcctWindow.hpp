@@ -32,12 +32,12 @@ namespace OccViewerQt
     public:
 
         //! Constructor
-        OcctWindow( QWidget* theWidget, const Quantity_NameOfColor theBackColor = Quantity_NOC_MATRAGRAY );
+        explicit OcctWindow( QWidget* theWidget, Quantity_NameOfColor theBackColor = Quantity_NOC_MATRAGRAY);
 
         //! Destructor
         virtual ~OcctWindow()
         {
-            myWidget = NULL;
+            myWidget = nullptr;
         }
 
         //! Returns native Window handle
@@ -78,7 +78,7 @@ namespace OccViewerQt
 
         virtual void Size( Standard_Integer& theWidth, Standard_Integer& theHeight ) const Standard_OVERRIDE;
 
-        virtual Aspect_FBConfig NativeFBConfig() const Standard_OVERRIDE { return NULL; }
+        virtual Aspect_FBConfig NativeFBConfig() const Standard_OVERRIDE { return nullptr; }
 
     protected:
         Standard_Integer myXLeft;

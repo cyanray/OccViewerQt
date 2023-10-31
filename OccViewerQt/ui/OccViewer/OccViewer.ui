@@ -6,22 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>636</width>
-    <height>464</height>
+    <width>629</width>
+    <height>404</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>OccViewerQt</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <layout class="QVBoxLayout" name="mainVertLayout">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-     </layout>
-    </item>
+   <layout class="QVBoxLayout" name="mainVertLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -29,7 +37,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>636</width>
+     <width>629</width>
      <height>22</height>
     </rect>
    </property>
@@ -76,7 +84,6 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>

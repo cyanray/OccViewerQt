@@ -5,65 +5,37 @@ IMPLEMENT_STANDARD_RTTIEXT(OccViewerQt::OcctWindow, Aspect_Window)
 
 namespace OccViewerQt
 {
-
-// =======================================================================
-// function : OcctWindow
-// purpose  :
-// =======================================================================
     OcctWindow::OcctWindow(QWidget* theWidget, const Quantity_NameOfColor theBackColor)
-            : myWidget (theWidget)
+            : myWidget(theWidget)
     {
         SetBackground(theBackColor);
-        myXLeft   = myWidget->rect().left();
-        myYTop    = myWidget->rect().top();
-        myXRight  = myWidget->rect().right();
+        myXLeft = myWidget->rect().left();
+        myYTop = myWidget->rect().top();
+        myXRight = myWidget->rect().right();
         myYBottom = myWidget->rect().bottom();
     }
 
-// =======================================================================
-// function : NativeParentHandle
-// purpose  :
-// =======================================================================
     Aspect_Drawable OcctWindow::NativeParentHandle() const
     {
         QWidget* aParentWidget = myWidget->parentWidget();
-        if (aParentWidget != nullptr)
-        {
-            return (Aspect_Drawable)aParentWidget->winId();
-        }
-        else
-        {
-            return NULL;
-        }
+        return aParentWidget ? (Aspect_Drawable) aParentWidget->winId() : nullptr;
     }
 
-// =======================================================================
-// function : Map
-// purpose  :
-// =======================================================================
     void OcctWindow::Map() const
     {
         myWidget->show();
         myWidget->update();
     }
 
-// =======================================================================
-// function : Unmap
-// purpose  :
-// =======================================================================
     void OcctWindow::Unmap() const
     {
         myWidget->hide();
         myWidget->update();
     }
 
-// =======================================================================
-// function : DoResize
-// purpose  :
-// =======================================================================
     Aspect_TypeOfResize OcctWindow::DoResize()
     {
-        int                 aMask = 0;
+        int aMask = 0;
         Aspect_TypeOfResize aMode = Aspect_TOR_UNKNOWN;
 
         if (!myWidget->isMinimized())
@@ -118,40 +90,28 @@ namespace OccViewerQt
                     break;
             }  // end switch
 
-            myXLeft   = myWidget->rect().left();
-            myXRight  = myWidget->rect().right();
-            myYTop    = myWidget->rect().top();
+            myXLeft = myWidget->rect().left();
+            myXRight = myWidget->rect().right();
+            myYTop = myWidget->rect().top();
             myYBottom = myWidget->rect().bottom();
         }
 
         return aMode;
     }
 
-// =======================================================================
-// function : Ratio
-// purpose  :
-// =======================================================================
     Standard_Real OcctWindow::Ratio() const
     {
         QRect aRect = myWidget->rect();
         return Standard_Real(aRect.right() - aRect.left()) / Standard_Real(aRect.bottom() - aRect.top());
     }
 
-// =======================================================================
-// function : Size
-// purpose  :
-// =======================================================================
     void OcctWindow::Size(Standard_Integer& theWidth, Standard_Integer& theHeight) const
     {
         QRect aRect = myWidget->rect();
-        theWidth  = aRect.width();
+        theWidth = aRect.width();
         theHeight = aRect.height();
     }
 
-// =======================================================================
-// function : Position
-// purpose  :
-// =======================================================================
     void OcctWindow::Position(Standard_Integer& theX1, Standard_Integer& theY1,
                               Standard_Integer& theX2, Standard_Integer& theY2) const
     {
@@ -160,5 +120,4 @@ namespace OccViewerQt
         theY1 = myWidget->rect().top();
         theY2 = myWidget->rect().bottom();
     }
-
 }

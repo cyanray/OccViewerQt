@@ -22,6 +22,12 @@ namespace OccViewerQt
     public:
         explicit OccViewer(QWidget *parent = nullptr);
         ~OccViewer() override;
+
+        [[nodiscard]] const auto& GetAISContext() const
+        {
+            return m_AISContext;
+        }
+
     private:
         Ui::OccViewer *m_ui;
 

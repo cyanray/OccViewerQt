@@ -30,7 +30,7 @@
 namespace
 {
     //! Map Qt buttons bitmask to virtual keys.
-    static Aspect_VKeyMouse qtMouseButtons2VKeys(Qt::MouseButtons theButtons)
+    Aspect_VKeyMouse qtMouseButtons2VKeys(Qt::MouseButtons theButtons)
     {
         Aspect_VKeyMouse aButtons = Aspect_VKeyMouse_NONE;
         if ((theButtons & Qt::LeftButton) != 0)
@@ -49,7 +49,7 @@ namespace
     }
 
     //! Map Qt mouse modifiers bitmask to virtual keys.
-    static Aspect_VKeyFlags qtMouseModifiers2VKeys(Qt::KeyboardModifiers theModifiers)
+    Aspect_VKeyFlags qtMouseModifiers2VKeys(Qt::KeyboardModifiers theModifiers)
     {
         Aspect_VKeyFlags aFlags = Aspect_VKeyFlags_NONE;
         if ((theModifiers & Qt::ShiftModifier) != 0)
@@ -67,12 +67,12 @@ namespace
         return aFlags;
     }
 
-    static QCursor* defCursor = NULL;
-    static QCursor* handCursor = NULL;
-    static QCursor* panCursor = NULL;
-    static QCursor* globPanCursor = NULL;
-    static QCursor* zoomCursor = NULL;
-    static QCursor* rotCursor = NULL;
+    QCursor* defCursor = nullptr;
+    QCursor* handCursor = nullptr;
+    QCursor* panCursor = nullptr;
+    QCursor* globPanCursor = nullptr;
+    QCursor* zoomCursor = nullptr;
+    QCursor* rotCursor = nullptr;
 
 }
 
@@ -80,13 +80,13 @@ namespace
 namespace OccViewerQt
 {
 
-    ViewWidget::ViewWidget (const Handle(AIS_InteractiveContext)& theContext, bool theIs3dView, QWidget* theParent)
+    ViewWidget::ViewWidget(const Handle(AIS_InteractiveContext)& theContext, bool theIs3dView, QWidget* theParent)
             : QWidget(theParent),
               myIsRaytracing(false),
               myIsShadowsEnabled(true),
               myIsReflectionsEnabled(false),
               myIsAntialiasingEnabled(false),
-              myIs3dView (theIs3dView),
+              myIs3dView(theIs3dView),
               myBackMenu(nullptr)
     {
 #if !defined(_WIN32) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX)) && QT_VERSION < 0x050000
@@ -130,7 +130,7 @@ namespace OccViewerQt
         if (myIs3dView)
         {
             SetAllowRotation(Standard_True);
-            myV3dView->SetBackgroundColor(Quantity_Color(0.0, 0.0, 0.3, Quantity_TOC_RGB));
+            myV3dView->SetBackgroundColor(Quantity_Color(0.08, 0.08, 0.08, Quantity_TOC_RGB));
         }
         else
         {
@@ -147,13 +147,13 @@ namespace OccViewerQt
         }
     }
 
-    void ViewWidget::paintEvent(QPaintEvent *)
+    void ViewWidget::paintEvent(QPaintEvent*)
     {
         myV3dView->InvalidateImmediate();
         FlushViewEvents(myContext, myV3dView, true);
     }
 
-    void ViewWidget::resizeEvent(QResizeEvent *)
+    void ViewWidget::resizeEvent(QResizeEvent*)
     {
         if (!myV3dView.IsNull())
         {
@@ -233,7 +233,7 @@ namespace OccViewerQt
 
     void ViewWidget::onRaytraceAction()
     {
-        QAction* aSentBy = (QAction*)sender();
+        QAction* aSentBy = (QAction*) sender();
 
         if (aSentBy == myRaytraceActions.value(RaytraceAction_Raytracing))
         {
@@ -295,7 +295,7 @@ namespace OccViewerQt
 
     void ViewWidget::updateToggled(bool isOn)
     {
-        QAction* sentBy = (QAction*)sender();
+        QAction* sentBy = (QAction*) sender();
         if (!isOn)
         {
             return;
@@ -350,7 +350,7 @@ namespace OccViewerQt
         return myViewActions.values();
     }
 
-    QList<QAction*>  ViewWidget::getRaytraceActions()
+    QList<QAction*> ViewWidget::getRaytraceActions()
     {
         initRaytraceActions();
         return myRaytraceActions.values();
@@ -376,7 +376,7 @@ namespace OccViewerQt
 
     QAction* ViewWidget::RegisterAction(QString theIconPath, QString thePromt)
     {
-        QAction* anAction = new QAction(QPixmap(theIconPath), thePromt, this);
+        auto* anAction = new QAction(QPixmap(theIconPath), thePromt, this);
         anAction->setToolTip(thePromt);
         anAction->setStatusTip(thePromt);
         return anAction;
@@ -457,17 +457,29 @@ namespace OccViewerQt
         anAntiAliasingAction->setChecked(false);
     }
 
-    void ViewWidget::activateCursor(const CurrentAction3d theMode)
+    void ViewWidget::activateCursor(CurrentAction3d theMode)
     {
         QCursor* aCursor = defCursor;
         switch (theMode)
         {
-            case CurrentAction3d_DynamicPanning:  aCursor = panCursor; break;
-            case CurrentAction3d_DynamicZooming:  aCursor = zoomCursor; break;
-            case CurrentAction3d_DynamicRotation: aCursor = rotCursor; break;
-            case CurrentAction3d_GlobalPanning:   aCursor = globPanCursor; break;
-            case CurrentAction3d_WindowZooming:   aCursor = handCursor; break;
-            case CurrentAction3d_Nothing:         aCursor = defCursor; break;
+            case CurrentAction3d_DynamicPanning:
+                aCursor = panCursor;
+                break;
+            case CurrentAction3d_DynamicZooming:
+                aCursor = zoomCursor;
+                break;
+            case CurrentAction3d_DynamicRotation:
+                aCursor = rotCursor;
+                break;
+            case CurrentAction3d_GlobalPanning:
+                aCursor = globPanCursor;
+                break;
+            case CurrentAction3d_WindowZooming:
+                aCursor = handCursor;
+                break;
+            case CurrentAction3d_Nothing:
+                aCursor = defCursor;
+                break;
             default:
                 break;
         }
@@ -513,7 +525,8 @@ namespace OccViewerQt
         Qt::MouseButtons aMouseButtons = theEvent->buttons();
         const Graphic3d_Vec2i aNewPos(theEvent->pos().x(), theEvent->pos().y());
         if (!myV3dView.IsNull()
-            && UpdateMousePosition(aNewPos, qtMouseButtons2VKeys(aMouseButtons), qtMouseModifiers2VKeys(theEvent->modifiers()), false))
+            && UpdateMousePosition(aNewPos, qtMouseButtons2VKeys(aMouseButtons),
+                                   qtMouseModifiers2VKeys(theEvent->modifiers()), false))
         {
             updateView();
         }
@@ -523,11 +536,11 @@ namespace OccViewerQt
 //function : wheelEvent
 //purpose  :
 //==============================================================================
-    void ViewWidget::wheelEvent(QWheelEvent* theEvent)
+    void ViewWidget::wheelEvent(QWheelEvent* event)
     {
-        const Graphic3d_Vec2i aPos(theEvent->position().x(), theEvent->position().y());
+        const Graphic3d_Vec2i aPos((int) event->position().x(), (int) event->position().y());
         if (!myV3dView.IsNull()
-            && UpdateZoom(Aspect_ScrollDelta(aPos, theEvent->angleDelta().y() / 8)))
+            && UpdateZoom(Aspect_ScrollDelta(aPos, event->angleDelta().y() / 8.0)))
         {
             updateView();
         }
@@ -597,7 +610,7 @@ namespace OccViewerQt
         Standard_Real G1;
         Standard_Real B1;
         myV3dView->BackgroundColor(Quantity_TOC_RGB, R1, G1, B1);
-        aColor.setRgb((Standard_Integer)(R1 * 255), (Standard_Integer)(G1 * 255), (Standard_Integer)(B1 * 255));
+        aColor.setRgb((Standard_Integer) (R1 * 255), (Standard_Integer) (G1 * 255), (Standard_Integer) (B1 * 255));
 
         QColor aRetColor = QColorDialog::getColor(aColor);
         if (aRetColor.isValid())
@@ -650,8 +663,8 @@ namespace OccViewerQt
         AIS_ListOfInteractive anAisObjectsList;
         myContext->DisplayedObjects(anAisObjectsList);
         double aTranspValue = theVal / 10.;
-        for(AIS_ListOfInteractive::Iterator anIter(anAisObjectsList);
-            anIter.More(); anIter.Next())
+        for (AIS_ListOfInteractive::Iterator anIter(anAisObjectsList);
+             anIter.More(); anIter.Next())
         {
             const Handle(AIS_InteractiveObject)& anAisObject = anIter.Value();
             myContext->SetTransparency(anAisObject, aTranspValue, Standard_False);
