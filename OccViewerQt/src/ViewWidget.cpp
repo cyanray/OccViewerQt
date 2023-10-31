@@ -532,10 +532,6 @@ namespace OccViewerQt
         }
     }
 
-//==============================================================================
-//function : wheelEvent
-//purpose  :
-//==============================================================================
     void ViewWidget::wheelEvent(QWheelEvent* event)
     {
         const Graphic3d_Vec2i aPos((int) event->position().x(), (int) event->position().y());
@@ -546,10 +542,7 @@ namespace OccViewerQt
         }
     }
 
-// =======================================================================
-// function : updateView
-// purpose  :
-// =======================================================================
+
     void ViewWidget::updateView()
     {
         update();
