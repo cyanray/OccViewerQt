@@ -56,7 +56,7 @@ target_link_libraries(OccViewerQt PUBLIC
         Qt::Core
         Qt::Gui
         Qt::Widgets)
-target_link_libraries(OccViewerQt PUBLIC ${OpenCASCADE_FoundationClasses_LIBRARIES} TKService TKV3d TKOpenGl TKMeshVS)
+target_link_libraries(OccViewerQt PUBLIC TKernel  TKMath  TKG2d  TKG3d  TKGeomBase  TKBRep  TKGeomAlgo  TKTopAlgo  TKPrim  TKBO  TKShHealing  TKBool  TKHLR  TKFillet  TKOffset  TKFeat  TKMesh  TKXMesh  TKService  TKV3d  TKOpenGl  TKMeshVS   TKCDF  TKLCAF  TKCAF  TKBinL  TKXmlL  TKBin  TKXml  TKStdL  TKStd  TKTObj  TKBinTObj  TKXmlTObj  TKVCAF  TKXDE  TKXSBase  TKSTEPBase  TKSTEPAttr  TKSTEP209  TKSTEP  TKIGES  TKXCAF  TKXDEIGES  TKXDESTEP  TKSTL  TKVRML  TKRWMesh  TKXmlXCAF  TKBinXCAF  TKXDECascade   )
 
 
 

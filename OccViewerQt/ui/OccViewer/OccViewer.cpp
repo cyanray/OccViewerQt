@@ -7,6 +7,7 @@
 
 
 #include <OpenGl_GraphicDriver.hxx>
+#include <OSD_Environment.hxx>
 
 namespace OccViewerQt
 {
