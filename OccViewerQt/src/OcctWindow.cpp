@@ -18,7 +18,7 @@ namespace OccViewerQt
     Aspect_Drawable OcctWindow::NativeParentHandle() const
     {
         QWidget* aParentWidget = myWidget->parentWidget();
-        return aParentWidget ? (Aspect_Drawable) aParentWidget->winId() : nullptr;
+        return aParentWidget ? (Aspect_Drawable) aParentWidget->winId() : (Aspect_Drawable){};
     }
 
     void OcctWindow::Map() const
