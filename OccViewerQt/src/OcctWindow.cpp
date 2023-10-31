@@ -108,8 +108,9 @@ namespace OccViewerQt
     void OcctWindow::Size(Standard_Integer& theWidth, Standard_Integer& theHeight) const
     {
         QRect aRect = myWidget->rect();
-        theWidth = aRect.width();
-        theHeight = aRect.height();
+        auto dpi = myWidget->devicePixelRatio();
+        theWidth = (Standard_Integer)(aRect.width() * dpi);
+        theHeight =(Standard_Integer)(aRect.height() * dpi);
     }
 
     void OcctWindow::Position(Standard_Integer& theX1, Standard_Integer& theY1,
