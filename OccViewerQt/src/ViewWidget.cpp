@@ -74,7 +74,8 @@ namespace OccViewerQt
               m_IsRaytracing(false),
               m_IsShadowsEnabled(true),
               m_IsReflectionsEnabled(false),
-              m_IsAntialiasingEnabled(false)
+              m_IsAntialiasingEnabled(false),
+              m_TrihedronEnabled(true)
     {
 #if !defined(_WIN32) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX)) && QT_VERSION < 0x050000
         XSynchronize(x11Info().display(), true);
