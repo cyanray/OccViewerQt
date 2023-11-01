@@ -37,14 +37,18 @@ set(OccViewerQt_INCLUDES
         include/OccViewerQt/OccViewer/OccViewer.h
         include/OccViewerQt/OccViewer/ViewWidget.hpp
         include/OccViewerQt/OccViewer/OcctWindow.hpp
-        include/OccViewerQt/SettingsDialog/SettingsDialog.h)
+        include/OccViewerQt/SettingsDialog/SettingsDialog.h
+        include/OccEasyDrawing/EasyDrawing.hpp
+        include/OccEasyDrawing/Common/Common.hpp
+        include/OccEasyDrawing/Common/ShapeRenderStyle.hpp)
 
 set(OccViewerQt_SRCS
         src/OccViewerQt.cpp
         ui/OccViewer/OccViewer.cpp
         src/ViewWidget.cpp
         src/OcctWindow.cpp
-        ui/SettingsDialog/SettingsDialog.cpp)
+        ui/SettingsDialog/SettingsDialog.cpp
+        src/EasyDrawing.cpp)
 
 set(OccViewerQt_UIS
         ui/OccViewer/OccViewer.ui

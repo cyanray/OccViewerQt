@@ -9,7 +9,8 @@
 #include "ViewWidget.hpp"
 #include "OccViewerQt/SettingsDialog/SettingsDialog.h"
 
-namespace Ui {
+namespace Ui
+{
     class OccViewer;
 }
 
@@ -18,21 +19,28 @@ namespace OccViewerQt
     class OccViewer : public QMainWindow
     {
     Q_OBJECT
+
     public:
-        explicit OccViewer(QWidget *parent = nullptr);
+        explicit OccViewer(QWidget* parent = nullptr);
+
         ~OccViewer() override;
 
-        [[nodiscard]] auto& GetAISContext() const
+        [[nodiscard]] auto& GetAISContext()
         {
             return m_AISContext;
         }
 
-        [[nodiscard]] auto& GetV3dViewer() const
+        [[nodiscard]] auto& GetV3dViewer()
         {
             return m_V3dViewer;
         }
 
-        [[nodiscard]] auto GetViewWidget() const
+        [[nodiscard]] auto& GetV3dView()
+        {
+            return m_ViewWidget->GetV3dView();
+        }
+
+        [[nodiscard]] auto GetViewWidget()
         {
             return m_ViewWidget;
         }
@@ -42,13 +50,13 @@ namespace OccViewerQt
         void Shading() const;
 
     private:
-        Ui::OccViewer *m_ui;
+        Ui::OccViewer* m_ui;
 
-        SettingsDialog*                m_SettingsDialog;
+        SettingsDialog* m_SettingsDialog;
 
-        ViewWidget*                    m_ViewWidget;
+        ViewWidget* m_ViewWidget;
 
-        Handle(V3d_Viewer)             m_V3dViewer;
+        Handle(V3d_Viewer) m_V3dViewer;
         Handle(AIS_InteractiveContext) m_AISContext;
 
     private:

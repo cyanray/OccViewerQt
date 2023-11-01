@@ -9,6 +9,8 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <Geom_CartesianPoint.hxx>
 
+#include <OccEasyDrawing/EasyDrawing.hpp>
+
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
@@ -130,26 +132,23 @@ int main(int argc, char* argv[])
     anAisBezierSurf->SetColor(Quantity_Color(Quantity_NOC_GREEN));
 
 
-    NCollection_Vector<Handle(AIS_InteractiveObject)> myObject3d;
+    std::vector<Handle(AIS_InteractiveObject) > objs;
 
-    myObject3d.Append(anAisBSplineSurf);
-    myObject3d.Append(anAisBezierSurf);
+    objs.push_back(anAisBSplineSurf);
+    objs.push_back(anAisBezierSurf);
     for (TColgp_Array2OfPnt::Iterator anIt(aBSplinePnts); anIt.More(); anIt.Next())
     {
-        myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
+        objs.push_back(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
     }
     for (TColgp_Array2OfPnt::Iterator anIt(aBezierPnts); anIt.More(); anIt.Next())
     {
-        myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
+        objs.push_back(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
     }
 
 
-    for (NCollection_Vector<Handle(AIS_InteractiveObject)>::Iterator anIter(myObject3d); anIter.More(); anIter.Next())
-    {
-        const Handle(AIS_InteractiveObject)& anObject = anIter.Value();
-        // anObject->SetDisplayMode(AIS_Shaded);
-        viewer.GetAISContext()->Display(anObject, Standard_False);
-    }
+    OccEasyDrawing::ViewerHandles handles{viewer.GetV3dView(), viewer.GetAISContext()};
+    OccEasyDrawing::DisplayObject(handles, objs);
+
 
     viewer.GetViewWidget()->Shading();
     viewer.GetViewWidget()->FitAll();
