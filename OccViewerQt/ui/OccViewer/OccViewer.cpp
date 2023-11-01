@@ -48,6 +48,8 @@ namespace OccViewerQt
 
         m_ui->mainVertLayout->addWidget(m_ViewWidget);
 
+        m_ui->actionTrihedron->setChecked(true);
+
         SetupActions();
     }
 
@@ -69,9 +71,20 @@ namespace OccViewerQt
         connect(m_ui->actionAxo, &QAction::triggered, m_ViewWidget, &ViewWidget::AxoView);
         connect(m_ui->actionWireframe, &QAction::triggered, m_ViewWidget, &ViewWidget::Wireframe);
         connect(m_ui->actionShade, &QAction::triggered, m_ViewWidget, &ViewWidget::Shading);
-        connect(m_ui->actionRayTracing, &QAction::triggered, m_ViewWidget, &ViewWidget::TiggerRaytracing);
+        connect(m_ui->actionRayTracing, &QAction::triggered, m_ViewWidget, &ViewWidget::TriggerRaytracing);
         connect(m_ui->actionShadow, &QAction::triggered, m_ViewWidget, &ViewWidget::SetRaytracedShadows);
         connect(m_ui->actionReflection, &QAction::triggered, m_ViewWidget, &ViewWidget::SetRaytracedReflections);
         connect(m_ui->actionTransparency, &QAction::triggered, m_ViewWidget, &ViewWidget::onTransparency);
+        connect(m_ui->actionTrihedron, &QAction::triggered, m_ViewWidget, &ViewWidget::TriggerTrihedron);
+    }
+
+    void OccViewer::FitAll() const
+    {
+        m_ViewWidget->FitAll();
+    }
+
+    void OccViewer::Shading() const
+    {
+        m_ViewWidget->Shading();
     }
 }

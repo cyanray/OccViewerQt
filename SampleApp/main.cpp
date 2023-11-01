@@ -13,6 +13,8 @@ int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
 
+    OccViewerQt::OccViewer viewer{};
+    viewer.show();
 
     // Define a 4x4 grid of points for BSpline surface.
     TColgp_Array2OfPnt aBSplinePnts(1, 4, 1, 4);
@@ -141,16 +143,17 @@ int main(int argc, char* argv[])
         myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
     }
 
-    OccViewerQt::OccViewer viewer{};
 
     for (NCollection_Vector<Handle(AIS_InteractiveObject)>::Iterator anIter(myObject3d); anIter.More(); anIter.Next())
     {
         const Handle(AIS_InteractiveObject)& anObject = anIter.Value();
+        // anObject->SetDisplayMode(AIS_Shaded);
         viewer.GetAISContext()->Display(anObject, Standard_False);
     }
 
+    viewer.Shading();
+    viewer.FitAll();
 
-    viewer.show();
 
     return QApplication::exec();
 }

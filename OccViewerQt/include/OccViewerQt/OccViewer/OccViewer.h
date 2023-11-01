@@ -28,6 +28,10 @@ namespace OccViewerQt
             return m_AISContext;
         }
 
+        void FitAll() const;
+
+        void Shading() const;
+
     private:
         Ui::OccViewer *m_ui;
 

@@ -71,6 +71,7 @@
     </property>
     <addaction name="actionWireframe"/>
     <addaction name="actionShade"/>
+    <addaction name="actionTrihedron"/>
     <addaction name="separator"/>
     <addaction name="actionRayTracing"/>
     <addaction name="actionShadow"/>
@@ -269,6 +270,14 @@
    </property>
    <property name="text">
     <string>Reflection</string>
+   </property>
+  </action>
+  <action name="actionTrihedron">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Trihedron</string>
    </property>
   </action>
  </widget>

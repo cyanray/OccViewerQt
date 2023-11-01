@@ -86,6 +86,8 @@ namespace OccViewerQt
 
         bool IsAntialiasingEnabled() const { return m_IsAntialiasingEnabled; }
 
+        bool IsTrihedronEnabled() const { return m_TrihedronEnabled; }
+
         virtual QPaintEngine* paintEngine() const override;
 
         const Handle(V3d_View)& getView() const { return m_V3dView; }
@@ -120,13 +122,15 @@ namespace OccViewerQt
 
         void onBackground();
 
-        void TiggerRaytracing(bool checked);
+        void TriggerRaytracing(bool checked);
 
         void SetRaytracedShadows(bool state);
 
         void SetRaytracedReflections(bool state);
 
         void SetRaytracedAntialiasing(bool state);
+
+        void TriggerTrihedron(bool checked);
 
     private slots:
 
@@ -154,6 +158,7 @@ namespace OccViewerQt
         bool m_IsShadowsEnabled;
         bool m_IsReflectionsEnabled;
         bool m_IsAntialiasingEnabled;
+        bool m_TrihedronEnabled;
 
         CurrentAction3d m_CurrentMode;
         Standard_Real m_CurZoom;

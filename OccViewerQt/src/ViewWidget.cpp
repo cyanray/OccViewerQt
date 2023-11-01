@@ -112,13 +112,9 @@ namespace OccViewerQt
 
         SetAllowRotation(Standard_True);
         m_V3dView->SetBackgroundColor(Quantity_Color(0.08, 0.08, 0.08, Quantity_TOC_RGB));
-
         m_V3dView->MustBeResized();
 
-        if (m_IsRaytracing)
-        {
-            m_V3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
-        }
+        TriggerTrihedron(true);
     }
 
     void ViewWidget::paintEvent(QPaintEvent*)
@@ -432,7 +428,7 @@ namespace OccViewerQt
         m_AISContext->UpdateCurrentViewer();
     }
 
-    void ViewWidget::TiggerRaytracing(bool checked)
+    void ViewWidget::TriggerRaytracing(bool checked)
     {
         if (checked)
         {
@@ -441,6 +437,19 @@ namespace OccViewerQt
         else
         {
             DisableRaytracing();
+        }
+    }
+
+    void ViewWidget::TriggerTrihedron(bool checked)
+    {
+        m_TrihedronEnabled = checked;
+        if(checked)
+        {
+            m_V3dView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.15, V3d_ZBUFFER);
+        }
+        else
+        {
+            m_V3dView->TriedronErase();
         }
     }
 
