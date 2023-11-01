@@ -88,9 +88,17 @@ namespace OccViewerQt
 
         bool IsTrihedronEnabled() const { return m_TrihedronEnabled; }
 
-        virtual QPaintEngine* paintEngine() const override;
+        auto& GetV3dView() const { return m_V3dView; }
 
-        const Handle(V3d_View)& getView() const { return m_V3dView; }
+        auto& GetAISContext() { return m_AISContext; }
+
+        CurrentAction3d GetCurrentMode() const { return m_CurrentMode; }
+
+        int GetMsaaSamples() const;
+
+        void SetMsaaSamples(int msaa_samples);
+
+        virtual QPaintEngine* paintEngine() const override;
 
     public slots:
 
@@ -148,10 +156,6 @@ namespace OccViewerQt
         virtual void mouseMoveEvent(QMouseEvent*) Standard_OVERRIDE;
 
         virtual void wheelEvent(QWheelEvent*) Standard_OVERRIDE;
-
-        auto& GetAISContext() { return m_AISContext; }
-
-        CurrentAction3d GetCurrentMode() const { return m_CurrentMode; }
 
     private:
         bool m_IsRaytracing;

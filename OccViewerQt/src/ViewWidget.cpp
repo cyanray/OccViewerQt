@@ -115,6 +115,7 @@ namespace OccViewerQt
         m_V3dView->MustBeResized();
 
         TriggerTrihedron(true);
+        SetMsaaSamples(8);
     }
 
     void ViewWidget::paintEvent(QPaintEvent*)
@@ -443,7 +444,7 @@ namespace OccViewerQt
     void ViewWidget::TriggerTrihedron(bool checked)
     {
         m_TrihedronEnabled = checked;
-        if(checked)
+        if (checked)
         {
             m_V3dView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.15, V3d_ZBUFFER);
         }
@@ -451,6 +452,16 @@ namespace OccViewerQt
         {
             m_V3dView->TriedronErase();
         }
+    }
+
+    int ViewWidget::GetMsaaSamples() const
+    {
+        return m_V3dView->RenderingParams().NbMsaaSamples;
+    }
+
+    void ViewWidget::SetMsaaSamples(int msaa_samples)
+    {
+        m_V3dView->ChangeRenderingParams().NbMsaaSamples = msaa_samples;
     }
 
 

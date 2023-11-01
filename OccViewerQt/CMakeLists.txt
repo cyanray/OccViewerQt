@@ -36,16 +36,19 @@ set(OccViewerQt_INCLUDES
         include/OccViewerQt/OccViewerQt.hpp
         include/OccViewerQt/OccViewer/OccViewer.h
         include/OccViewerQt/OccViewer/ViewWidget.hpp
-        include/OccViewerQt/OccViewer/OcctWindow.hpp)
+        include/OccViewerQt/OccViewer/OcctWindow.hpp
+        include/OccViewerQt/SettingsDialog/SettingsDialog.h)
 
 set(OccViewerQt_SRCS
         src/OccViewerQt.cpp
         ui/OccViewer/OccViewer.cpp
         src/ViewWidget.cpp
-        src/OcctWindow.cpp)
+        src/OcctWindow.cpp
+        ui/SettingsDialog/SettingsDialog.cpp)
 
 set(OccViewerQt_UIS
-        ui/OccViewer/OccViewer.ui)
+        ui/OccViewer/OccViewer.ui
+        ui/SettingsDialog/SettingsDialog.ui)
 
 
 

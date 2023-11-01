@@ -151,9 +151,8 @@ int main(int argc, char* argv[])
         viewer.GetAISContext()->Display(anObject, Standard_False);
     }
 
-    viewer.Shading();
-    viewer.FitAll();
-
+    viewer.GetViewWidget()->Shading();
+    viewer.GetViewWidget()->FitAll();
 
     return QApplication::exec();
 }

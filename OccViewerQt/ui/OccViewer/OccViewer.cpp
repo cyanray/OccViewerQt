@@ -11,7 +11,10 @@
 
 namespace OccViewerQt
 {
-    OccViewer::OccViewer(QWidget* parent) : QMainWindow(parent), m_ui(new Ui::OccViewer)
+    OccViewer::OccViewer(QWidget* parent)
+        : QMainWindow(parent),
+          m_ui(new Ui::OccViewer),
+          m_SettingsDialog(new SettingsDialog(this))
     {
         m_ui->setupUi(this);
 
@@ -43,18 +46,16 @@ namespace OccViewerQt
 
         m_AISContext = new AIS_InteractiveContext(m_V3dViewer);
 
-
         m_ViewWidget = new ViewWidget(m_AISContext, this);
-
         m_ui->mainVertLayout->addWidget(m_ViewWidget);
-
         m_ui->actionTrihedron->setChecked(true);
-
         SetupActions();
     }
 
     OccViewer::~OccViewer()
     {
+        delete m_SettingsDialog;
+        delete m_ViewWidget;
         delete m_ui;
     }
 
@@ -76,6 +77,7 @@ namespace OccViewerQt
         connect(m_ui->actionReflection, &QAction::triggered, m_ViewWidget, &ViewWidget::SetRaytracedReflections);
         connect(m_ui->actionTransparency, &QAction::triggered, m_ViewWidget, &ViewWidget::onTransparency);
         connect(m_ui->actionTrihedron, &QAction::triggered, m_ViewWidget, &ViewWidget::TriggerTrihedron);
+        connect(m_ui->actionSettings, &QAction::triggered, m_SettingsDialog, &SettingsDialog::show);
     }
 
     void OccViewer::FitAll() const

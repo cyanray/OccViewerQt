@@ -4,11 +4,10 @@
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_Viewer.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QMainWindow>
-#include <Standard_WarningsRestore.hxx>
 
 #include "ViewWidget.hpp"
+#include "OccViewerQt/SettingsDialog/SettingsDialog.h"
 
 namespace Ui {
     class OccViewer;
@@ -23,9 +22,19 @@ namespace OccViewerQt
         explicit OccViewer(QWidget *parent = nullptr);
         ~OccViewer() override;
 
-        [[nodiscard]] const auto& GetAISContext() const
+        [[nodiscard]] auto& GetAISContext() const
         {
             return m_AISContext;
+        }
+
+        [[nodiscard]] auto& GetV3dViewer() const
+        {
+            return m_V3dViewer;
+        }
+
+        [[nodiscard]] auto GetViewWidget() const
+        {
+            return m_ViewWidget;
         }
 
         void FitAll() const;
@@ -34,6 +43,8 @@ namespace OccViewerQt
 
     private:
         Ui::OccViewer *m_ui;
+
+        SettingsDialog*                m_SettingsDialog;
 
         ViewWidget*                    m_ViewWidget;
 
