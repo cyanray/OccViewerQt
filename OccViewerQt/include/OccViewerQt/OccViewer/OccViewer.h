@@ -45,6 +45,9 @@ namespace OccViewerQt
             return m_ViewWidget;
         }
 
+    protected:
+        void closeEvent(QCloseEvent *event) override;
+
     private:
         Ui::OccViewer* m_ui;
 

@@ -1,9 +1,8 @@
 #include "OccViewerQt/OccViewer/OccViewer.h"
 #include "ui_OccViewer.h"
 
-#include <Standard_WarningsDisable.hxx>
 #include <QtWidgets>
-#include <Standard_WarningsRestore.hxx>
+#include <QCloseEvent>
 
 
 #include <OpenGl_GraphicDriver.hxx>
@@ -12,9 +11,9 @@
 namespace OccViewerQt
 {
     OccViewer::OccViewer(QWidget* parent)
-        : QMainWindow(parent),
-          m_ui(new Ui::OccViewer),
-          m_SettingsDialog(new SettingsDialog(this))
+            : QMainWindow(parent),
+              m_ui(new Ui::OccViewer),
+              m_SettingsDialog(new SettingsDialog(this))
     {
         m_ui->setupUi(this);
 
@@ -78,6 +77,12 @@ namespace OccViewerQt
         connect(m_ui->actionTransparency, &QAction::triggered, m_ViewWidget, &ViewWidget::onTransparency);
         connect(m_ui->actionTrihedron, &QAction::triggered, m_ViewWidget, &ViewWidget::TriggerTrihedron);
         connect(m_ui->actionSettings, &QAction::triggered, m_SettingsDialog, &SettingsDialog::show);
+    }
+
+    void OccViewer::closeEvent(QCloseEvent* event)
+    {
+        event->ignore();
+        hide();
     }
 
 }
