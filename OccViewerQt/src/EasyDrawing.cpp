@@ -13,6 +13,8 @@
 #include <Geom_CartesianPoint.hxx>
 
 #include <stdexcept>
+#include <GC_MakeSegment.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
 
 
 namespace OccEasyDrawing
@@ -84,5 +86,10 @@ namespace OccEasyDrawing
     Handle(AIS_InteractiveObject) MakePoint(const gp_Pnt& pt)
     {
         return new AIS_Point(new Geom_CartesianPoint(pt));
+    }
+
+    Handle(AIS_InteractiveObject) MakeLine(const gp_Pnt& pt1, const gp_Pnt& pt2)
+    {
+        return {new AIS_ColoredShape(BRepBuilderAPI_MakeEdge(GC_MakeSegment(pt1, pt2).Value()).Shape())};
     }
 }

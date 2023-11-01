@@ -31,4 +31,6 @@ namespace OccEasyDrawing
 
 	Handle(AIS_ColoredShape) MakePolygonBSplineSurface(const std::vector<gp_Pnt>& vertex);
 
+    Handle(AIS_InteractiveObject) MakeLine(const gp_Pnt& pt1, const gp_Pnt& pt2);
+
 }
