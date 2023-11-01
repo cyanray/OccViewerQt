@@ -78,12 +78,6 @@ namespace OccViewerQt
 
         void DisableRaytracing();
 
-        void SetRaytracedShadows(bool state);
-
-        void SetRaytracedReflections(bool state);
-
-        void SetRaytracedAntialiasing(bool state);
-
         bool IsRaytracingMode() const { return m_IsRaytracing; }
 
         bool IsShadowsEnabled() const { return m_IsShadowsEnabled; }
@@ -100,7 +94,19 @@ namespace OccViewerQt
 
         void FitAll();
 
-        void Axo();
+        void FrontView();
+
+        void BackView();
+
+        void TopView();
+
+        void BottomView();
+
+        void LeftView();
+
+        void RightView();
+
+        void AxoView();
 
         void HLROn();
 
@@ -113,6 +119,14 @@ namespace OccViewerQt
         void onTransparency();
 
         void onBackground();
+
+        void TiggerRaytracing(bool checked);
+
+        void SetRaytracedShadows(bool state);
+
+        void SetRaytracedReflections(bool state);
+
+        void SetRaytracedAntialiasing(bool state);
 
     private slots:
 
@@ -152,7 +166,7 @@ namespace OccViewerQt
 
         void UpdateView();
 
-        //! Setup mouse gestures.
+        //! SetupActions mouse gestures.
         void DefineMouseGestures();
 
         //! Set current action.

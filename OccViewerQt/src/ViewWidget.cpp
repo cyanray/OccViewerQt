@@ -129,7 +129,8 @@ namespace OccViewerQt
 
     void ViewWidget::resizeEvent(QResizeEvent*)
     {
-        if (!m_V3dView.IsNull()) m_V3dView->MustBeResized();
+        if (m_V3dView.IsNull()) return;
+        m_V3dView->MustBeResized();
     }
 
     void ViewWidget::OnSelectionChanged(const Handle(AIS_InteractiveContext)& context,
@@ -141,18 +142,64 @@ namespace OccViewerQt
 
     void ViewWidget::FitAll()
     {
+        if (m_V3dView.IsNull()) return;
         m_V3dView->FitAll();
         m_V3dView->ZFitAll();
         m_V3dView->Redraw();
     }
 
-    void ViewWidget::Axo()
+    void ViewWidget::AxoView()
     {
+        if (m_V3dView.IsNull()) return;
         m_V3dView->SetProj(V3d_XposYnegZpos);
+        FitAll();
+    }
+
+    void ViewWidget::FrontView()
+    {
+        if (m_V3dView.IsNull()) return;
+        m_V3dView->SetProj(V3d_Yneg);
+        FitAll();
+    }
+
+    void ViewWidget::BackView()
+    {
+        if (m_V3dView.IsNull()) return;
+        m_V3dView->SetProj(V3d_Ypos);
+        FitAll();
+    }
+
+    void ViewWidget::TopView()
+    {
+        if (m_V3dView.IsNull()) return;
+        m_V3dView->SetProj(V3d_Zpos);
+        FitAll();
+    }
+
+    void ViewWidget::BottomView()
+    {
+        if (m_V3dView.IsNull()) return;
+        m_V3dView->SetProj(V3d_Zneg);
+        FitAll();
+    }
+
+    void ViewWidget::LeftView()
+    {
+        if (m_V3dView.IsNull()) return;
+        m_V3dView->SetProj(V3d_Xneg);
+        FitAll();
+    }
+
+    void ViewWidget::RightView()
+    {
+        if (m_V3dView.IsNull()) return;
+        m_V3dView->SetProj(V3d_Xpos);
+        FitAll();
     }
 
     void ViewWidget::HLROff()
     {
+        if (m_V3dView.IsNull()) return;
         QApplication::setOverrideCursor(Qt::WaitCursor);
         m_V3dView->SetComputedMode(Standard_False);
         m_V3dView->Redraw();
@@ -161,6 +208,7 @@ namespace OccViewerQt
 
     void ViewWidget::HLROn()
     {
+        if (m_V3dView.IsNull()) return;
         QApplication::setOverrideCursor(Qt::WaitCursor);
         m_V3dView->SetComputedMode(Standard_True);
         m_V3dView->Redraw();
@@ -169,16 +217,19 @@ namespace OccViewerQt
 
     void ViewWidget::Shading()
     {
+        if (m_V3dView.IsNull()) return;
         m_AISContext->SetDisplayMode(1, Standard_True);
     }
 
     void ViewWidget::Wireframe()
     {
+        if (m_V3dView.IsNull()) return;
         m_AISContext->SetDisplayMode(0, Standard_True);
     }
 
     void ViewWidget::SetRaytracedShadows(bool state)
     {
+        if (m_V3dView.IsNull()) return;
         m_V3dView->ChangeRenderingParams().IsShadowEnabled = state;
         m_IsShadowsEnabled = state;
         m_AISContext->UpdateCurrentViewer();
@@ -186,6 +237,7 @@ namespace OccViewerQt
 
     void ViewWidget::SetRaytracedReflections(bool state)
     {
+        if (m_V3dView.IsNull()) return;
         m_V3dView->ChangeRenderingParams().IsReflectionEnabled = state;
         m_IsReflectionsEnabled = state;
         m_AISContext->UpdateCurrentViewer();
@@ -193,6 +245,7 @@ namespace OccViewerQt
 
     void ViewWidget::SetRaytracedAntialiasing(bool state)
     {
+        if (m_V3dView.IsNull()) return;
         m_V3dView->ChangeRenderingParams().IsAntialiasingEnabled = state;
         m_IsAntialiasingEnabled = state;
         m_AISContext->UpdateCurrentViewer();
@@ -200,6 +253,7 @@ namespace OccViewerQt
 
     void ViewWidget::EnableRaytracing()
     {
+        if (m_V3dView.IsNull()) return;
         if (!m_IsRaytracing)
         {
             m_V3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
@@ -377,5 +431,18 @@ namespace OccViewerQt
         }
         m_AISContext->UpdateCurrentViewer();
     }
+
+    void ViewWidget::TiggerRaytracing(bool checked)
+    {
+        if (checked)
+        {
+            EnableRaytracing();
+        }
+        else
+        {
+            DisableRaytracing();
+        }
+    }
+
 
 }

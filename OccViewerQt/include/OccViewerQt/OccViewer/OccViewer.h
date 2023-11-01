@@ -35,5 +35,9 @@ namespace OccViewerQt
 
         Handle(V3d_Viewer)             m_V3dViewer;
         Handle(AIS_InteractiveContext) m_AISContext;
+
+    private:
+        void SetupActions();
+
     };
 }

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>629</width>
+    <width>651</width>
     <height>404</height>
    </rect>
   </property>
@@ -37,7 +37,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>629</width>
+     <width>651</width>
      <height>22</height>
     </rect>
    </property>
@@ -46,13 +46,14 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
-    <addaction name="actionSave_As"/>
+    <addaction name="actionImport"/>
+    <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuView">
+   <widget class="QMenu" name="menuScene">
     <property name="title">
-     <string>ViewWidget</string>
+     <string>Scene</string>
     </property>
     <addaction name="actionFront"/>
     <addaction name="actionBack"/>
@@ -61,16 +62,26 @@
     <addaction name="actionLeft"/>
     <addaction name="actionRight"/>
     <addaction name="actionAxo"/>
-   </widget>
-   <widget class="QMenu" name="menuScene">
-    <property name="title">
-     <string>Scene</string>
-    </property>
+    <addaction name="separator"/>
+    <addaction name="actionFitAll"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionWireframe"/>
+    <addaction name="actionShade"/>
+    <addaction name="separator"/>
+    <addaction name="actionRayTracing"/>
+    <addaction name="actionShadow"/>
+    <addaction name="actionReflection"/>
+    <addaction name="actionAntiAliasing"/>
+    <addaction name="separator"/>
+    <addaction name="actionColor"/>
+    <addaction name="actionMaterial"/>
+    <addaction name="actionTransparency"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -79,7 +90,6 @@
     <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
    <addaction name="menuScene"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -95,16 +105,48 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
-   <addaction name="actionSave_As"/>
+   <addaction name="actionExport"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionFitAll"/>
+   <addaction name="actionAxo"/>
+   <addaction name="actionFront"/>
+   <addaction name="actionBack"/>
+   <addaction name="actionTop"/>
+   <addaction name="actionBottom"/>
+   <addaction name="actionLeft"/>
+   <addaction name="actionRight"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_3">
+   <property name="windowTitle">
+    <string>toolBar_3</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionWireframe"/>
+   <addaction name="actionShade"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>
    </property>
   </action>
-  <action name="actionSave_As">
+  <action name="actionExport">
    <property name="text">
-    <string>Save As</string>
+    <string>Export</string>
    </property>
   </action>
   <action name="actionExit">
@@ -155,6 +197,78 @@
   <action name="actionAxo">
    <property name="text">
     <string>Axo</string>
+   </property>
+  </action>
+  <action name="actionFitAll">
+   <property name="text">
+    <string>FitAll</string>
+   </property>
+  </action>
+  <action name="actionWireframe">
+   <property name="text">
+    <string>Wireframe</string>
+   </property>
+  </action>
+  <action name="actionShade">
+   <property name="text">
+    <string>Shade</string>
+   </property>
+  </action>
+  <action name="actionRayTracing">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>RayTracing</string>
+   </property>
+  </action>
+  <action name="actionAntiAliasing">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>AntiAliasing</string>
+   </property>
+  </action>
+  <action name="actionColor">
+   <property name="text">
+    <string>Color</string>
+   </property>
+  </action>
+  <action name="actionMaterial">
+   <property name="text">
+    <string>Material</string>
+   </property>
+  </action>
+  <action name="actionTransparency">
+   <property name="text">
+    <string>Transparency</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="actionShadow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Shadow</string>
+   </property>
+  </action>
+  <action name="actionReflection">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Reflection</string>
    </property>
   </action>
  </widget>

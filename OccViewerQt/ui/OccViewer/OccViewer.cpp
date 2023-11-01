@@ -11,9 +11,7 @@
 
 namespace OccViewerQt
 {
-    OccViewer::OccViewer(QWidget* parent)
-            : QMainWindow(parent),
-              m_ui(new Ui::OccViewer)
+    OccViewer::OccViewer(QWidget* parent) : QMainWindow(parent), m_ui(new Ui::OccViewer)
     {
         m_ui->setupUi(this);
 
@@ -46,14 +44,34 @@ namespace OccViewerQt
         m_AISContext = new AIS_InteractiveContext(m_V3dViewer);
 
 
-
         m_ViewWidget = new ViewWidget(m_AISContext, this);
 
         m_ui->mainVertLayout->addWidget(m_ViewWidget);
+
+        SetupActions();
     }
 
     OccViewer::~OccViewer()
     {
         delete m_ui;
+    }
+
+    void OccViewer::SetupActions()
+    {
+        connect(m_ui->actionExit, &QAction::triggered, this, &OccViewer::close);
+        connect(m_ui->actionFitAll, &QAction::triggered, m_ViewWidget, &ViewWidget::FitAll);
+        connect(m_ui->actionFront, &QAction::triggered, m_ViewWidget, &ViewWidget::FrontView);
+        connect(m_ui->actionBack, &QAction::triggered, m_ViewWidget, &ViewWidget::BackView);
+        connect(m_ui->actionTop, &QAction::triggered, m_ViewWidget, &ViewWidget::TopView);
+        connect(m_ui->actionBottom, &QAction::triggered, m_ViewWidget, &ViewWidget::BottomView);
+        connect(m_ui->actionLeft, &QAction::triggered, m_ViewWidget, &ViewWidget::LeftView);
+        connect(m_ui->actionRight, &QAction::triggered, m_ViewWidget, &ViewWidget::RightView);
+        connect(m_ui->actionAxo, &QAction::triggered, m_ViewWidget, &ViewWidget::AxoView);
+        connect(m_ui->actionWireframe, &QAction::triggered, m_ViewWidget, &ViewWidget::Wireframe);
+        connect(m_ui->actionShade, &QAction::triggered, m_ViewWidget, &ViewWidget::Shading);
+        connect(m_ui->actionRayTracing, &QAction::triggered, m_ViewWidget, &ViewWidget::TiggerRaytracing);
+        connect(m_ui->actionShadow, &QAction::triggered, m_ViewWidget, &ViewWidget::SetRaytracedShadows);
+        connect(m_ui->actionReflection, &QAction::triggered, m_ViewWidget, &ViewWidget::SetRaytracedReflections);
+        connect(m_ui->actionTransparency, &QAction::triggered, m_ViewWidget, &ViewWidget::onTransparency);
     }
 }

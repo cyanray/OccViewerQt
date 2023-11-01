@@ -149,6 +149,7 @@ int main(int argc, char* argv[])
         viewer.GetAISContext()->Display(anObject, Standard_False);
     }
 
+
     viewer.show();
 
     return QApplication::exec();
