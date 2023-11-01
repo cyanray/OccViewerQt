@@ -45,10 +45,6 @@ namespace OccViewerQt
             return m_ViewWidget;
         }
 
-        void FitAll() const;
-
-        void Shading() const;
-
     private:
         Ui::OccViewer* m_ui;
 

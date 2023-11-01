@@ -80,13 +80,4 @@ namespace OccViewerQt
         connect(m_ui->actionSettings, &QAction::triggered, m_SettingsDialog, &SettingsDialog::show);
     }
 
-    void OccViewer::FitAll() const
-    {
-        m_ViewWidget->FitAll();
-    }
-
-    void OccViewer::Shading() const
-    {
-        m_ViewWidget->Shading();
-    }
 }
