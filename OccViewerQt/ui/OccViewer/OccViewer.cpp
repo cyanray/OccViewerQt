@@ -47,7 +47,7 @@ namespace OccViewerQt
 
 
 
-        m_ViewWidget = new ViewWidget(m_AISContext, true, this);
+        m_ViewWidget = new ViewWidget(m_AISContext, this);
 
         m_ui->mainVertLayout->addWidget(m_ViewWidget);
     }

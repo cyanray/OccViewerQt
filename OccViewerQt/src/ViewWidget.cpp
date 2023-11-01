@@ -5,7 +5,6 @@
 #include <OccViewerQt/OccViewer/ViewWidget.hpp>
 #include <OccViewerQt/OccViewer/OcctWindow.hpp>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QApplication>
 #include <QBoxLayout>
 #include <QFileInfo>
@@ -16,7 +15,6 @@
 #include <QCursor>
 #include <QPainter>
 #include <QStyleFactory>
-#include <Standard_WarningsRestore.hxx>
 
 #if !defined(_WIN32) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX)) && QT_VERSION < 0x050000
 #include <QX11Info>
@@ -30,558 +28,298 @@
 namespace
 {
     //! Map Qt buttons bitmask to virtual keys.
-    Aspect_VKeyMouse qtMouseButtons2VKeys(Qt::MouseButtons theButtons)
+    Aspect_VKeyMouse QtMouseButtons2VKeyMouse(Qt::MouseButtons buttons)
     {
-        Aspect_VKeyMouse aButtons = Aspect_VKeyMouse_NONE;
-        if ((theButtons & Qt::LeftButton) != 0)
+        Aspect_VKeyMouse vkey_mouse = Aspect_VKeyMouse_NONE;
+        if ((buttons & Qt::LeftButton) != 0)
         {
-            aButtons |= Aspect_VKeyMouse_LeftButton;
+            vkey_mouse |= Aspect_VKeyMouse_LeftButton;
         }
-        if ((theButtons & Qt::MiddleButton) != 0)
+        if ((buttons & Qt::MiddleButton) != 0)
         {
-            aButtons |= Aspect_VKeyMouse_MiddleButton;
+            vkey_mouse |= Aspect_VKeyMouse_MiddleButton;
         }
-        if ((theButtons & Qt::RightButton) != 0)
+        if ((buttons & Qt::RightButton) != 0)
         {
-            aButtons |= Aspect_VKeyMouse_RightButton;
+            vkey_mouse |= Aspect_VKeyMouse_RightButton;
         }
-        return aButtons;
+        return vkey_mouse;
     }
 
     //! Map Qt mouse modifiers bitmask to virtual keys.
-    Aspect_VKeyFlags qtMouseModifiers2VKeys(Qt::KeyboardModifiers theModifiers)
+    Aspect_VKeyFlags QtMouseModifiers2VKeyFlags(Qt::KeyboardModifiers modifiers)
     {
-        Aspect_VKeyFlags aFlags = Aspect_VKeyFlags_NONE;
-        if ((theModifiers & Qt::ShiftModifier) != 0)
+        Aspect_VKeyFlags vkey_flags = Aspect_VKeyFlags_NONE;
+        if ((modifiers & Qt::ShiftModifier) != 0)
         {
-            aFlags |= Aspect_VKeyFlags_SHIFT;
+            vkey_flags |= Aspect_VKeyFlags_SHIFT;
         }
-        if ((theModifiers & Qt::ControlModifier) != 0)
+        if ((modifiers & Qt::ControlModifier) != 0)
         {
-            aFlags |= Aspect_VKeyFlags_CTRL;
+            vkey_flags |= Aspect_VKeyFlags_CTRL;
         }
-        if ((theModifiers & Qt::AltModifier) != 0)
+        if ((modifiers & Qt::AltModifier) != 0)
         {
-            aFlags |= Aspect_VKeyFlags_ALT;
+            vkey_flags |= Aspect_VKeyFlags_ALT;
         }
-        return aFlags;
+        return vkey_flags;
     }
-
-    QCursor* defCursor = nullptr;
-    QCursor* handCursor = nullptr;
-    QCursor* panCursor = nullptr;
-    QCursor* globPanCursor = nullptr;
-    QCursor* zoomCursor = nullptr;
-    QCursor* rotCursor = nullptr;
-
 }
-
 
 namespace OccViewerQt
 {
 
-    ViewWidget::ViewWidget(const Handle(AIS_InteractiveContext)& theContext, bool theIs3dView, QWidget* theParent)
-            : QWidget(theParent),
-              myIsRaytracing(false),
-              myIsShadowsEnabled(true),
-              myIsReflectionsEnabled(false),
-              myIsAntialiasingEnabled(false),
-              myIs3dView(theIs3dView),
-              myBackMenu(nullptr)
+    ViewWidget::ViewWidget(const Handle(AIS_InteractiveContext)& ais_context, QWidget* parent)
+            : QWidget(parent),
+              m_IsRaytracing(false),
+              m_IsShadowsEnabled(true),
+              m_IsReflectionsEnabled(false),
+              m_IsAntialiasingEnabled(false)
     {
 #if !defined(_WIN32) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX)) && QT_VERSION < 0x050000
         XSynchronize(x11Info().display(), true);
 #endif
-        myContext = theContext;
-        myCurZoom = 0;
+        m_AISContext = ais_context;
+        m_CurZoom = 0;
 
         setAttribute(Qt::WA_PaintOnScreen);
         setAttribute(Qt::WA_NoSystemBackground);
 
-        myDefaultGestures = myMouseGestureMap;
-        myCurrentMode = CurrentAction3d_Nothing;
+        m_DefaultGestures = myMouseGestureMap;
+        m_CurrentMode = CurrentAction3d::Nothing;
         setMouseTracking(true);
 
-        initViewActions();
-        initCursors();
+        setBackgroundRole(QPalette::NoRole);
 
-        setBackgroundRole(QPalette::NoRole);//NoBackground );
         // set focus policy to threat QContextMenuEvent from keyboard
         setFocusPolicy(Qt::StrongFocus);
         setAttribute(Qt::WA_PaintOnScreen);
         setAttribute(Qt::WA_NoSystemBackground);
-        init();
+        Init();
     }
 
-    void ViewWidget::init()
+    void ViewWidget::Init()
     {
-        if (myV3dView.IsNull())
+        if (m_V3dView.IsNull())
         {
-            myV3dView = myContext->CurrentViewer()->CreateView();
+            m_V3dView = m_AISContext->CurrentViewer()->CreateView();
         }
 
         Handle(OcctWindow) hWnd = new OcctWindow(this);
-        myV3dView->SetWindow(hWnd);
-        if (!hWnd->IsMapped())
-        {
-            hWnd->Map();
-        }
+        m_V3dView->SetWindow(hWnd);
+        if (!hWnd->IsMapped()) hWnd->Map();
 
-        if (myIs3dView)
-        {
-            SetAllowRotation(Standard_True);
-            myV3dView->SetBackgroundColor(Quantity_Color(0.08, 0.08, 0.08, Quantity_TOC_RGB));
-        }
-        else
-        {
-            SetAllowRotation(Standard_False);
-            myV3dView->SetBackgroundColor(Quantity_Color(0.0, 0.2, 0.0, Quantity_TOC_RGB));
-            myV3dView->SetProj(V3d_Zpos);
-        }
 
-        myV3dView->MustBeResized();
+        SetAllowRotation(Standard_True);
+        m_V3dView->SetBackgroundColor(Quantity_Color(0.08, 0.08, 0.08, Quantity_TOC_RGB));
 
-        if (myIsRaytracing)
+        m_V3dView->MustBeResized();
+
+        if (m_IsRaytracing)
         {
-            myV3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
+            m_V3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
         }
     }
 
     void ViewWidget::paintEvent(QPaintEvent*)
     {
-        myV3dView->InvalidateImmediate();
-        FlushViewEvents(myContext, myV3dView, true);
+        m_V3dView->InvalidateImmediate();
+        FlushViewEvents(m_AISContext, m_V3dView, true);
     }
 
     void ViewWidget::resizeEvent(QResizeEvent*)
     {
-        if (!myV3dView.IsNull())
-        {
-            myV3dView->MustBeResized();
-        }
+        if (!m_V3dView.IsNull()) m_V3dView->MustBeResized();
     }
 
-    void ViewWidget::OnSelectionChanged(const Handle(AIS_InteractiveContext)& theCtx,
-                                        const Handle(V3d_View)& theView)
+    void ViewWidget::OnSelectionChanged(const Handle(AIS_InteractiveContext)& context,
+                                        const Handle(V3d_View)& view)
     {
-        Q_UNUSED(theCtx)
-        Q_UNUSED(theView)
+        Q_UNUSED(context)
+        Q_UNUSED(view)
     }
 
-    void ViewWidget::fitAll()
+    void ViewWidget::FitAll()
     {
-        myV3dView->FitAll();
-        myV3dView->ZFitAll();
-        myV3dView->Redraw();
+        m_V3dView->FitAll();
+        m_V3dView->ZFitAll();
+        m_V3dView->Redraw();
     }
 
-    void ViewWidget::axo()
+    void ViewWidget::Axo()
     {
-        if (myIs3dView)
-        {
-            myV3dView->SetProj(V3d_XposYnegZpos);
-        }
+        m_V3dView->SetProj(V3d_XposYnegZpos);
     }
 
-    void ViewWidget::hlrOff()
+    void ViewWidget::HLROff()
     {
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        myV3dView->SetComputedMode(Standard_False);
-        myV3dView->Redraw();
-        QAction* aShadingAction = getViewAction(ViewAction_Shading);
-        aShadingAction->setEnabled(true);
-        QAction* aWireframeAction = getViewAction(ViewAction_Wireframe);
-        aWireframeAction->setEnabled(true);
+        m_V3dView->SetComputedMode(Standard_False);
+        m_V3dView->Redraw();
         QApplication::restoreOverrideCursor();
     }
 
-    void ViewWidget::hlrOn()
+    void ViewWidget::HLROn()
     {
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        myV3dView->SetComputedMode(Standard_True);
-        myV3dView->Redraw();
-        QAction* aShadingAction = getViewAction(ViewAction_Shading);
-        aShadingAction->setEnabled(false);
-        QAction* aWireframeAction = getViewAction(ViewAction_Wireframe);
-        aWireframeAction->setEnabled(false);
+        m_V3dView->SetComputedMode(Standard_True);
+        m_V3dView->Redraw();
         QApplication::restoreOverrideCursor();
     }
 
-    void ViewWidget::shading()
+    void ViewWidget::Shading()
     {
-        myContext->SetDisplayMode(1, Standard_True);
+        m_AISContext->SetDisplayMode(1, Standard_True);
     }
 
-    void ViewWidget::wireframe()
+    void ViewWidget::Wireframe()
     {
-        myContext->SetDisplayMode(0, Standard_True);
+        m_AISContext->SetDisplayMode(0, Standard_True);
     }
 
-    void ViewWidget::SetRaytracedShadows(bool theState)
+    void ViewWidget::SetRaytracedShadows(bool state)
     {
-        myV3dView->ChangeRenderingParams().IsShadowEnabled = theState;
-        myIsShadowsEnabled = theState;
-        myContext->UpdateCurrentViewer();
+        m_V3dView->ChangeRenderingParams().IsShadowEnabled = state;
+        m_IsShadowsEnabled = state;
+        m_AISContext->UpdateCurrentViewer();
     }
 
-    void ViewWidget::SetRaytracedReflections(bool theState)
+    void ViewWidget::SetRaytracedReflections(bool state)
     {
-        myV3dView->ChangeRenderingParams().IsReflectionEnabled = theState;
-        myIsReflectionsEnabled = theState;
-        myContext->UpdateCurrentViewer();
+        m_V3dView->ChangeRenderingParams().IsReflectionEnabled = state;
+        m_IsReflectionsEnabled = state;
+        m_AISContext->UpdateCurrentViewer();
     }
 
-    void ViewWidget::onRaytraceAction()
+    void ViewWidget::SetRaytracedAntialiasing(bool state)
     {
-        QAction* aSentBy = (QAction*) sender();
-
-        if (aSentBy == myRaytraceActions.value(RaytraceAction_Raytracing))
-        {
-            bool aState = myRaytraceActions.value(RaytraceAction_Raytracing)->isChecked();
-
-            QApplication::setOverrideCursor(Qt::WaitCursor);
-            if (aState)
-                EnableRaytracing();
-            else
-                DisableRaytracing();
-            QApplication::restoreOverrideCursor();
-        }
-
-        if (aSentBy == myRaytraceActions.value(RaytraceAction_Shadows))
-        {
-            bool aState = myRaytraceActions.value(RaytraceAction_Shadows)->isChecked();
-            SetRaytracedShadows(aState);
-        }
-
-        if (aSentBy == myRaytraceActions.value(RaytraceAction_Reflections))
-        {
-            bool aState = myRaytraceActions.value(RaytraceAction_Reflections)->isChecked();
-            SetRaytracedReflections(aState);
-        }
-
-        if (aSentBy == myRaytraceActions.value(RaytraceAction_Antialiasing))
-        {
-            bool aState = myRaytraceActions.value(RaytraceAction_Antialiasing)->isChecked();
-            SetRaytracedAntialiasing(aState);
-        }
-    }
-
-    void ViewWidget::SetRaytracedAntialiasing(bool theState)
-    {
-        myV3dView->ChangeRenderingParams().IsAntialiasingEnabled = theState;
-        myIsAntialiasingEnabled = theState;
-        myContext->UpdateCurrentViewer();
+        m_V3dView->ChangeRenderingParams().IsAntialiasingEnabled = state;
+        m_IsAntialiasingEnabled = state;
+        m_AISContext->UpdateCurrentViewer();
     }
 
     void ViewWidget::EnableRaytracing()
     {
-        if (!myIsRaytracing)
+        if (!m_IsRaytracing)
         {
-            myV3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
+            m_V3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
         }
-        myIsRaytracing = true;
-        myContext->UpdateCurrentViewer();
+        m_IsRaytracing = true;
+        m_AISContext->UpdateCurrentViewer();
     }
 
     void ViewWidget::DisableRaytracing()
     {
-        if (myIsRaytracing)
+        if (m_IsRaytracing)
         {
-            myV3dView->ChangeRenderingParams().Method = Graphic3d_RM_RASTERIZATION;
+            m_V3dView->ChangeRenderingParams().Method = Graphic3d_RM_RASTERIZATION;
         }
-        myIsRaytracing = false;
-        myContext->UpdateCurrentViewer();
+        m_IsRaytracing = false;
+        m_AISContext->UpdateCurrentViewer();
     }
 
-    void ViewWidget::updateToggled(bool isOn)
-    {
-        QAction* sentBy = (QAction*) sender();
-        if (!isOn)
-        {
-            return;
-        }
-
-                foreach (QAction* anAction, myViewActions)
-            {
-                if (anAction && (anAction != sentBy))
-                {
-                    anAction->setCheckable(true);
-                    anAction->setChecked(false);
-                }
-                else
-                {
-                    if (sentBy == myViewActions.value(ViewAction_FitArea))
-                        setCursor(*handCursor);
-                    else if (sentBy == myViewActions.value(ViewAction_Zoom))
-                        setCursor(*zoomCursor);
-                    else if (sentBy == myViewActions.value(ViewAction_Pan))
-                        setCursor(*panCursor);
-                    else if (sentBy == myViewActions.value(ViewAction_GlobalPan))
-                        setCursor(*globPanCursor);
-                    else if (sentBy == myViewActions.value(ViewAction_Rotation))
-                        setCursor(*rotCursor);
-                    else
-                        setCursor(*defCursor);
-
-                    sentBy->setCheckable(false);
-                }
-            }
-    }
-
-    void ViewWidget::initCursors()
-    {
-        if (!defCursor)
-            defCursor = new QCursor(Qt::ArrowCursor);
-        if (!handCursor)
-            handCursor = new QCursor(Qt::PointingHandCursor);
-        if (!panCursor)
-            panCursor = new QCursor(Qt::SizeAllCursor);
-        if (!globPanCursor)
-            globPanCursor = new QCursor(Qt::CrossCursor);
-        if (!zoomCursor)
-            zoomCursor = new QCursor(QPixmap(":/icons/cursor_zoom.png"));
-        if (!rotCursor)
-            rotCursor = new QCursor(QPixmap(":/icons/cursor_rotate.png"));
-    }
-
-    QList<QAction*> ViewWidget::getViewActions()
-    {
-        initViewActions();
-        return myViewActions.values();
-    }
-
-    QList<QAction*> ViewWidget::getRaytraceActions()
-    {
-        initRaytraceActions();
-        return myRaytraceActions.values();
-    }
-
-    QAction* ViewWidget::getViewAction(ViewAction theAction)
-    {
-        return myViewActions.value(theAction);
-    }
-
-    QAction* ViewWidget::getRaytraceAction(RaytraceAction theAction)
-    {
-        return myRaytraceActions.value(theAction);
-    }
-
-/*!
-  Get paint engine for the OpenGL viewer. [ virtual public ]
-*/
     QPaintEngine* ViewWidget::paintEngine() const
     {
-        return 0;
+        return nullptr;
     }
 
-    QAction* ViewWidget::RegisterAction(QString theIconPath, QString thePromt)
+    void ViewWidget::mousePressEvent(QMouseEvent* event)
     {
-        auto* anAction = new QAction(QPixmap(theIconPath), thePromt, this);
-        anAction->setToolTip(thePromt);
-        anAction->setStatusTip(thePromt);
-        return anAction;
-    }
-
-    void ViewWidget::initViewActions()
-    {
-//        if (!myViewActions.empty())
-//            return;
-//        myViewActions[ViewAction_FitAll] = RegisterAction(":/icons/view_fitall.png", tr("Fit all"));
-//        connect(myViewActions[ViewAction_FitAll], SIGNAL(triggered()), this, SLOT(fitAll()));
-//        if (myIs3dView)
-//        {
-//            myViewActions[ViewAction_Axo] = RegisterAction(":/icons/view_axo.png", tr("Isometric"));
-//            connect(myViewActions[ViewAction_Axo], SIGNAL(triggered()), this, SLOT(axo()));
-//
-//            QActionGroup* aShadingActionGroup = new QActionGroup(this);
-//            QAction* aShadingAction = RegisterAction(":/icons/tool_shading.png", tr("Shading"));
-//            connect(aShadingAction, SIGNAL(triggered()), this, SLOT(shading()));
-//            aShadingAction->setCheckable(true);
-//            aShadingActionGroup->addAction(aShadingAction);
-//            myViewActions[ViewAction_Shading] = aShadingAction;
-//
-//            QAction* aWireframeAction = RegisterAction(":/icons/tool_wireframe.png", tr("Wireframe"));
-//            connect(aWireframeAction, SIGNAL(triggered()), this, SLOT(wireframe()));
-//            aWireframeAction->setCheckable(true);
-//            aShadingActionGroup->addAction(aWireframeAction);
-//            myViewActions[ViewAction_Wireframe] = aWireframeAction;
-//
-//            QActionGroup* aHlrActionGroup = new QActionGroup(this);
-//            QAction* aHlrOffAction = RegisterAction(":/icons/view_comp_off.png", tr("HLR off"));
-//            connect(aHlrOffAction, SIGNAL(triggered()), this, SLOT(hlrOff()));
-//            aHlrOffAction->setCheckable(true);
-//            aHlrActionGroup->addAction(aHlrOffAction);
-//            myViewActions[ViewAction_HlrOff] = aHlrOffAction;
-//
-//            QAction* aHlrOnAction = RegisterAction(":/icons/view_comp_on.png", tr("HLR on"));
-//            connect(aHlrOnAction, SIGNAL(triggered()), this, SLOT(hlrOn()));
-//            aHlrOnAction->setCheckable(true);
-//            aHlrActionGroup->addAction(aHlrOnAction);
-//            myViewActions[ViewAction_HlrOn] = aHlrOnAction;
-//
-//            QAction* aTransparencyAction = RegisterAction(":/icons/tool_transparency.png", tr("Transparency"));
-//            connect(aTransparencyAction, SIGNAL(triggered()), this, SLOT(onTransparency()));
-//            myViewActions[ViewAction_Transparency] = aTransparencyAction;
-//        }
-    }
-
-    void ViewWidget::initRaytraceActions()
-    {
-        if (!myRaytraceActions.empty())
+        Qt::MouseButtons mouose_buttons = event->buttons();
+        auto dpi = this->devicePixelRatio();
+        const Graphic3d_Vec2i pnt(event->pos().x() * dpi, event->pos().y() * dpi);
+        const Aspect_VKeyFlags flags = QtMouseModifiers2VKeyFlags(event->modifiers());
+        if (!m_V3dView.IsNull()
+            && UpdateMouseButtons(pnt, QtMouseButtons2VKeyMouse(mouose_buttons), flags, false))
         {
-            return;
+            UpdateView();
+        }
+        m_ClickPos = pnt;
+    }
+
+    void ViewWidget::mouseReleaseEvent(QMouseEvent* event)
+    {
+        Qt::MouseButtons mouse_buttons = event->buttons();
+        auto dpi = this->devicePixelRatio();
+        const Graphic3d_Vec2i pnt(event->pos().x() * dpi, event->pos().y() * dpi);
+        const Aspect_VKeyFlags flags = QtMouseModifiers2VKeyFlags(event->modifiers());
+        if (!m_V3dView.IsNull()
+            && UpdateMouseButtons(pnt, QtMouseButtons2VKeyMouse(mouse_buttons), flags, false))
+        {
+            UpdateView();
         }
 
-        QAction* aRayTraceAction = RegisterAction(":/icons/raytracing.png", tr("Ray-tracing"));
-        connect(aRayTraceAction, SIGNAL(triggered()), this, SLOT(onRaytraceAction()));
-        myRaytraceActions[RaytraceAction_Raytracing] = aRayTraceAction;
-        aRayTraceAction->setCheckable(true);
-        aRayTraceAction->setChecked(false);
-
-        QAction* aShadowAction = RegisterAction(":/icons/shadows.png", tr("Shadows"));
-        connect(aShadowAction, SIGNAL(triggered()), this, SLOT(onRaytraceAction()));
-        myRaytraceActions[RaytraceAction_Shadows] = aShadowAction;
-        aShadowAction->setCheckable(true);
-        aShadowAction->setChecked(true);
-
-        QAction* aReflectAction = RegisterAction(":/icons/reflections.png", tr("Reflections"));
-        connect(aReflectAction, SIGNAL(triggered()), this, SLOT(onRaytraceAction()));
-        myRaytraceActions[RaytraceAction_Reflections] = aReflectAction;
-        aReflectAction->setCheckable(true);
-        aReflectAction->setChecked(false);
-
-        QAction* anAntiAliasingAction = RegisterAction(":/icons/antialiasing.png", tr("Anti-aliasing"));
-        connect(anAntiAliasingAction, SIGNAL(triggered()), this, SLOT(onRaytraceAction()));
-        myRaytraceActions[RaytraceAction_Antialiasing] = anAntiAliasingAction;
-        anAntiAliasingAction->setCheckable(true);
-        anAntiAliasingAction->setChecked(false);
-    }
-
-    void ViewWidget::activateCursor(CurrentAction3d theMode)
-    {
-        QCursor* aCursor = defCursor;
-        switch (theMode)
+        if (m_CurrentMode == CurrentAction3d::GlobalPanning)
         {
-            case CurrentAction3d_DynamicPanning:
-                aCursor = panCursor;
-                break;
-            case CurrentAction3d_DynamicZooming:
-                aCursor = zoomCursor;
-                break;
-            case CurrentAction3d_DynamicRotation:
-                aCursor = rotCursor;
-                break;
-            case CurrentAction3d_GlobalPanning:
-                aCursor = globPanCursor;
-                break;
-            case CurrentAction3d_WindowZooming:
-                aCursor = handCursor;
-                break;
-            case CurrentAction3d_Nothing:
-                aCursor = defCursor;
-                break;
-            default:
-                break;
+            m_V3dView->Place(pnt.x(), pnt.y(), m_CurZoom);
         }
-        setCursor(*aCursor);
-    }
-
-    void ViewWidget::mousePressEvent(QMouseEvent* theEvent)
-    {
-        Qt::MouseButtons aMouseButtons = theEvent->buttons();
-        const Graphic3d_Vec2i aPnt(theEvent->pos().x(), theEvent->pos().y());
-        const Aspect_VKeyFlags aFlags = qtMouseModifiers2VKeys(theEvent->modifiers());
-        if (!myV3dView.IsNull()
-            && UpdateMouseButtons(aPnt, qtMouseButtons2VKeys(aMouseButtons), aFlags, false))
+        if (m_CurrentMode != CurrentAction3d::Nothing)
         {
-            updateView();
-        }
-        myClickPos = aPnt;
-    }
-
-    void ViewWidget::mouseReleaseEvent(QMouseEvent* theEvent)
-    {
-        Qt::MouseButtons aMouseButtons = theEvent->buttons();
-        const Graphic3d_Vec2i aPnt(theEvent->pos().x(), theEvent->pos().y());
-        const Aspect_VKeyFlags aFlags = qtMouseModifiers2VKeys(theEvent->modifiers());
-        if (!myV3dView.IsNull()
-            && UpdateMouseButtons(aPnt, qtMouseButtons2VKeys(aMouseButtons), aFlags, false))
-        {
-            updateView();
-        }
-
-        if (myCurrentMode == CurrentAction3d_GlobalPanning)
-        {
-            myV3dView->Place(aPnt.x(), aPnt.y(), myCurZoom);
-        }
-        if (myCurrentMode != CurrentAction3d_Nothing)
-        {
-            setCurrentAction(CurrentAction3d_Nothing);
+            SetCurrentAction(CurrentAction3d::Nothing);
         }
     }
 
-    void ViewWidget::mouseMoveEvent(QMouseEvent* theEvent)
+    void ViewWidget::mouseMoveEvent(QMouseEvent* event)
     {
-        Qt::MouseButtons aMouseButtons = theEvent->buttons();
-        const Graphic3d_Vec2i aNewPos(theEvent->pos().x(), theEvent->pos().y());
-        if (!myV3dView.IsNull()
-            && UpdateMousePosition(aNewPos, qtMouseButtons2VKeys(aMouseButtons),
-                                   qtMouseModifiers2VKeys(theEvent->modifiers()), false))
+        Qt::MouseButtons mouse_buttons = event->buttons();
+        auto dpi = this->devicePixelRatio();
+        const Graphic3d_Vec2i new_pos(event->pos().x() * dpi, event->pos().y() * dpi);
+        if (!m_V3dView.IsNull()
+            && UpdateMousePosition(new_pos, QtMouseButtons2VKeyMouse(mouse_buttons),
+                                   QtMouseModifiers2VKeyFlags(event->modifiers()), false))
         {
-            updateView();
+            UpdateView();
         }
     }
 
     void ViewWidget::wheelEvent(QWheelEvent* event)
     {
-        const Graphic3d_Vec2i aPos((int) event->position().x(), (int) event->position().y());
-        if (!myV3dView.IsNull()
-            && UpdateZoom(Aspect_ScrollDelta(aPos, event->angleDelta().y() / 8.0)))
+        const Graphic3d_Vec2i pos((int) event->position().x(), (int) event->position().y());
+        if (!m_V3dView.IsNull()
+            && UpdateZoom(Aspect_ScrollDelta(pos, event->angleDelta().y() / 8.0)))
         {
-            updateView();
+            UpdateView();
         }
     }
 
 
-    void ViewWidget::updateView()
+    void ViewWidget::UpdateView()
     {
         update();
     }
 
-    void ViewWidget::defineMouseGestures()
+    void ViewWidget::DefineMouseGestures()
     {
         myMouseGestureMap.Clear();
-        AIS_MouseGesture aRot = AIS_MouseGesture_RotateOrbit;
-        activateCursor(myCurrentMode);
-        switch (myCurrentMode)
+        switch (m_CurrentMode)
         {
-            case CurrentAction3d_Nothing:
+            case CurrentAction3d::Nothing:
             {
-                myMouseGestureMap = myDefaultGestures;
+                myMouseGestureMap = m_DefaultGestures;
                 break;
             }
-            case CurrentAction3d_DynamicZooming:
+            case CurrentAction3d::DynamicZooming:
             {
                 myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, AIS_MouseGesture_Zoom);
                 break;
             }
-            case CurrentAction3d_GlobalPanning:
+            case CurrentAction3d::GlobalPanning:
             {
                 break;
             }
-            case CurrentAction3d_WindowZooming:
+            case CurrentAction3d::WindowZooming:
             {
                 myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, AIS_MouseGesture_ZoomWindow);
                 break;
             }
-            case CurrentAction3d_DynamicPanning:
+            case CurrentAction3d::DynamicPanning:
             {
                 myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, AIS_MouseGesture_Pan);
                 break;
             }
-            case CurrentAction3d_DynamicRotation:
+            case CurrentAction3d::DynamicRotation:
             {
-                myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, aRot);
+                myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, AIS_MouseGesture_RotateOrbit);
                 break;
             }
             default:
@@ -589,11 +327,6 @@ namespace OccViewerQt
                 break;
             }
         }
-    }
-
-    void ViewWidget::addItemInPopup(QMenu* theMenu)
-    {
-        Q_UNUSED(theMenu)
     }
 
     void ViewWidget::onBackground()
@@ -602,7 +335,7 @@ namespace OccViewerQt
         Standard_Real R1;
         Standard_Real G1;
         Standard_Real B1;
-        myV3dView->BackgroundColor(Quantity_TOC_RGB, R1, G1, B1);
+        m_V3dView->BackgroundColor(Quantity_TOC_RGB, R1, G1, B1);
         aColor.setRgb((Standard_Integer) (R1 * 255), (Standard_Integer) (G1 * 255), (Standard_Integer) (B1 * 255));
 
         QColor aRetColor = QColorDialog::getColor(aColor);
@@ -611,28 +344,9 @@ namespace OccViewerQt
             R1 = aRetColor.red() / 255.;
             G1 = aRetColor.green() / 255.;
             B1 = aRetColor.blue() / 255.;
-            myV3dView->SetBackgroundColor(Quantity_TOC_RGB, R1, G1, B1);
+            m_V3dView->SetBackgroundColor(Quantity_TOC_RGB, R1, G1, B1);
         }
-        myV3dView->Redraw();
-    }
-
-    void ViewWidget::onEnvironmentMap()
-    {
-        if (myBackMenu->actions().at(1)->isChecked())
-        {
-            QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "",
-                                                            tr("All Image Files (*.bmp *.gif *.jpg *.jpeg *.png *.tga)"));
-
-            const TCollection_AsciiString anUtf8Path(fileName.toUtf8().data());
-            Handle(Graphic3d_TextureEnv) aTexture = new Graphic3d_TextureEnv(anUtf8Path);
-            myV3dView->SetTextureEnv(aTexture);
-        }
-        else
-        {
-            myV3dView->SetTextureEnv(Handle(Graphic3d_TextureEnv)());
-        }
-
-        myV3dView->Redraw();
+        m_V3dView->Redraw();
     }
 
     void ViewWidget::onTransparency()
@@ -651,18 +365,17 @@ namespace OccViewerQt
         aDlg.exec();*/
     }
 
-    void ViewWidget::onTransparencyChanged(int theVal)
+    void ViewWidget::onTransparencyChanged(int value)
     {
-        AIS_ListOfInteractive anAisObjectsList;
-        myContext->DisplayedObjects(anAisObjectsList);
-        double aTranspValue = theVal / 10.;
-        for (AIS_ListOfInteractive::Iterator anIter(anAisObjectsList);
-             anIter.More(); anIter.Next())
+        AIS_ListOfInteractive objs;
+        m_AISContext->DisplayedObjects(objs);
+        double val = value / 10.;
+        for (AIS_ListOfInteractive::Iterator it(objs); it.More(); it.Next())
         {
-            const Handle(AIS_InteractiveObject)& anAisObject = anIter.Value();
-            myContext->SetTransparency(anAisObject, aTranspValue, Standard_False);
+            const auto& ais_obj = it.Value();
+            m_AISContext->SetTransparency(ais_obj, val, Standard_False);
         }
-        myContext->UpdateCurrentViewer();
+        m_AISContext->UpdateCurrentViewer();
     }
 
 }

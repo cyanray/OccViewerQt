@@ -1,124 +1,110 @@
 #include <OccViewerQt/OccViewer/OcctWindow.hpp>
 
+#include <array>
 
 IMPLEMENT_STANDARD_RTTIEXT(OccViewerQt::OcctWindow, Aspect_Window)
 
 namespace OccViewerQt
 {
-    OcctWindow::OcctWindow(QWidget* theWidget, const Quantity_NameOfColor theBackColor)
-            : myWidget(theWidget)
+    OcctWindow::OcctWindow(QWidget* widget, const Quantity_NameOfColor background_color)
+            : m_Widget(widget)
     {
-        SetBackground(theBackColor);
-        myXLeft = myWidget->rect().left();
-        myYTop = myWidget->rect().top();
-        myXRight = myWidget->rect().right();
-        myYBottom = myWidget->rect().bottom();
+        SetBackground(background_color);
+        m_XLeft = m_Widget->rect().left();
+        m_YTop = m_Widget->rect().top();
+        m_XRight = m_Widget->rect().right();
+        m_YBottom = m_Widget->rect().bottom();
     }
 
     Aspect_Drawable OcctWindow::NativeParentHandle() const
     {
-        QWidget* aParentWidget = myWidget->parentWidget();
-        return aParentWidget ? (Aspect_Drawable) aParentWidget->winId() : (Aspect_Drawable){};
+        QWidget* aParentWidget = m_Widget->parentWidget();
+        return aParentWidget ? (Aspect_Drawable) aParentWidget->winId() : Aspect_Drawable{};
     }
 
     void OcctWindow::Map() const
     {
-        myWidget->show();
-        myWidget->update();
+        m_Widget->show();
+        m_Widget->update();
     }
 
     void OcctWindow::Unmap() const
     {
-        myWidget->hide();
-        myWidget->update();
+        m_Widget->hide();
+        m_Widget->update();
     }
 
     Aspect_TypeOfResize OcctWindow::DoResize()
     {
-        int aMask = 0;
-        Aspect_TypeOfResize aMode = Aspect_TOR_UNKNOWN;
+        if (m_Widget->isMinimized()) return Aspect_TOR_UNKNOWN;
 
-        if (!myWidget->isMinimized())
+        const static std::array<Aspect_TypeOfResize, 11> mode_table =
         {
-            if (Abs(myWidget->rect().left() - myXLeft) > 2)
-            {
-                aMask |= 1;
-            }
-            if (Abs(myWidget->rect().right() - myXRight) > 2)
-            {
-                aMask |= 2;
-            }
-            if (Abs(myWidget->rect().top() - myYTop) > 2)
-            {
-                aMask |= 4;
-            }
-            if (Abs(myWidget->rect().bottom() - myYBottom) > 2)
-            {
-                aMask |= 8;
-            }
+            Aspect_TOR_NO_BORDER,
+            Aspect_TOR_LEFT_BORDER,
+            Aspect_TOR_RIGHT_BORDER,
+            Aspect_TOR_UNKNOWN,             // UNKNOWN
+            Aspect_TOR_TOP_BORDER,
+            Aspect_TOR_LEFT_AND_TOP_BORDER,
+            Aspect_TOR_TOP_AND_RIGHT_BORDER,
+            Aspect_TOR_UNKNOWN,             // UNKNOWN
+            Aspect_TOR_BOTTOM_BORDER,
+            Aspect_TOR_BOTTOM_AND_LEFT_BORDER,
+            Aspect_TOR_RIGHT_AND_BOTTOM_BORDER
+        };
 
-            switch (aMask)
-            {
-                case 0:
-                    aMode = Aspect_TOR_NO_BORDER;
-                    break;
-                case 1:
-                    aMode = Aspect_TOR_LEFT_BORDER;
-                    break;
-                case 2:
-                    aMode = Aspect_TOR_RIGHT_BORDER;
-                    break;
-                case 4:
-                    aMode = Aspect_TOR_TOP_BORDER;
-                    break;
-                case 5:
-                    aMode = Aspect_TOR_LEFT_AND_TOP_BORDER;
-                    break;
-                case 6:
-                    aMode = Aspect_TOR_TOP_AND_RIGHT_BORDER;
-                    break;
-                case 8:
-                    aMode = Aspect_TOR_BOTTOM_BORDER;
-                    break;
-                case 9:
-                    aMode = Aspect_TOR_BOTTOM_AND_LEFT_BORDER;
-                    break;
-                case 10:
-                    aMode = Aspect_TOR_RIGHT_AND_BOTTOM_BORDER;
-                    break;
-                default:
-                    break;
-            }  // end switch
-
-            myXLeft = myWidget->rect().left();
-            myXRight = myWidget->rect().right();
-            myYTop = myWidget->rect().top();
-            myYBottom = myWidget->rect().bottom();
+        int mask = 0;
+        if (Abs(m_Widget->rect().left() - m_XLeft) > 2)
+        {
+            mask |= 1;
+        }
+        if (Abs(m_Widget->rect().right() - m_XRight) > 2)
+        {
+            mask |= 2;
+        }
+        if (Abs(m_Widget->rect().top() - m_YTop) > 2)
+        {
+            mask |= 4;
+        }
+        if (Abs(m_Widget->rect().bottom() - m_YBottom) > 2)
+        {
+            mask |= 8;
         }
 
-        return aMode;
+        Aspect_TypeOfResize mode = Aspect_TOR_UNKNOWN;
+        if (mask >= 0 && mask < mode_table.size())
+        {
+            mode = mode_table[mask];
+        }
+
+        m_XLeft = m_Widget->rect().left();
+        m_XRight = m_Widget->rect().right();
+        m_YTop = m_Widget->rect().top();
+        m_YBottom = m_Widget->rect().bottom();
+
+        return mode;
     }
 
     Standard_Real OcctWindow::Ratio() const
     {
-        QRect aRect = myWidget->rect();
+        QRect aRect = m_Widget->rect();
         return Standard_Real(aRect.right() - aRect.left()) / Standard_Real(aRect.bottom() - aRect.top());
     }
 
-    void OcctWindow::Size(Standard_Integer& theWidth, Standard_Integer& theHeight) const
+    void OcctWindow::Size(Standard_Integer& width, Standard_Integer& height) const
     {
-        QRect aRect = myWidget->rect();
-        auto dpi = myWidget->devicePixelRatio();
-        theWidth = (Standard_Integer)(aRect.width() * dpi);
-        theHeight =(Standard_Integer)(aRect.height() * dpi);
+        QRect aRect = m_Widget->rect();
+        auto dpi = m_Widget->devicePixelRatio();
+        width = (Standard_Integer) (aRect.width() * dpi);
+        height = (Standard_Integer) (aRect.height() * dpi);
     }
 
-    void OcctWindow::Position(Standard_Integer& theX1, Standard_Integer& theY1,
-                              Standard_Integer& theX2, Standard_Integer& theY2) const
+    void OcctWindow::Position(Standard_Integer& x1, Standard_Integer& y1,
+                              Standard_Integer& x2, Standard_Integer& y2) const
     {
-        theX1 = myWidget->rect().left();
-        theX2 = myWidget->rect().right();
-        theY1 = myWidget->rect().top();
-        theY2 = myWidget->rect().bottom();
+        x1 = m_Widget->rect().left();
+        x2 = m_Widget->rect().right();
+        y1 = m_Widget->rect().top();
+        y2 = m_Widget->rect().bottom();
     }
 }
