@@ -1,0 +1,8 @@
+{
+  "name": "occviewerqt",
+  "version": "1.0",
+  "dependencies": [
+    "qtbase",
+    "opencascade"
+  ]
+}

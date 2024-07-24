@@ -17,7 +17,6 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 
 
-
 find_package(OpenCASCADE CONFIG REQUIRED)
 # List of available OpenCASCADE libraries for each module
 set(OpenCASCADE_FoundationClasses_LIBRARIES TKernel TKMath)
@@ -28,8 +27,7 @@ set(OpenCASCADE_ApplicationFramework_LIBRARIES TKCDF TKLCAF TKCAF TKBinL TKXmlL 
 set(OpenCASCADE_DataExchange_LIBRARIES TKXDE TKXSBase TKSTEPBase TKSTEPAttr TKSTEP209 TKSTEP TKIGES TKXCAF TKXDEIGES TKXDESTEP TKSTL TKVRML TKRWMesh TKXmlXCAF TKBinXCAF TKXDECascade TKExpress)
 set(OpenCASCADE_Draw_LIBRARIES TKDraw TKTopTest TKOpenGlTest TKViewerTest TKD3DHostTest TKXSDRAW TKDCAF TKXDEDRAW TKTObjDRAW TKQADraw)
 # List of available OpenCASCADE libraries.
-set (OpenCASCADE_LIBRARIES TKernel  TKMath  TKG2d  TKG3d  TKGeomBase  TKBRep  TKGeomAlgo  TKTopAlgo  TKPrim  TKBO  TKShHealing  TKBool  TKHLR  TKFillet  TKOffset  TKFeat  TKMesh  TKXMesh  TKService  TKV3d  TKOpenGl  TKMeshVS  TKD3DHost  TKCDF  TKLCAF  TKCAF  TKBinL  TKXmlL  TKBin  TKXml  TKStdL  TKStd  TKTObj  TKBinTObj  TKXmlTObj  TKVCAF  TKXDE  TKXSBase  TKSTEPBase  TKSTEPAttr  TKSTEP209  TKSTEP  TKIGES  TKXCAF  TKXDEIGES  TKXDESTEP  TKSTL  TKVRML  TKRWMesh  TKXmlXCAF  TKBinXCAF  TKXDECascade  TKExpress  TKDraw  TKTopTest  TKOpenGlTest  TKViewerTest  TKD3DHostTest  TKXSDRAW  TKDCAF  TKXDEDRAW  TKTObjDRAW  TKQADraw)
-
+set(OpenCASCADE_LIBRARIES TKernel TKMath TKG2d TKG3d TKGeomBase TKBRep TKGeomAlgo TKTopAlgo TKPrim TKBO TKShHealing TKBool TKHLR TKFillet TKOffset TKFeat TKMesh TKXMesh TKService TKV3d TKOpenGl TKMeshVS TKD3DHost TKCDF TKLCAF TKCAF TKBinL TKXmlL TKBin TKXml TKStdL TKStd TKTObj TKBinTObj TKXmlTObj TKVCAF TKXDE TKXSBase TKSTEPBase TKSTEPAttr TKSTEP209 TKSTEP TKIGES TKXCAF TKXDEIGES TKXDESTEP TKSTL TKVRML TKRWMesh TKXmlXCAF TKBinXCAF TKXDECascade TKExpress TKDraw TKTopTest TKOpenGlTest TKViewerTest TKD3DHostTest TKXSDRAW TKDCAF TKXDEDRAW TKTObjDRAW TKQADraw)
 
 
 set(OccViewerQt_INCLUDES
@@ -55,16 +53,16 @@ set(OccViewerQt_UIS
         ui/SettingsDialog/SettingsDialog.ui)
 
 
-
-
 add_library(OccViewerQt STATIC ${OccViewerQt_INCLUDES} ${OccViewerQt_SRCS} ${OccViewerQt_UIS})
 target_include_directories(OccViewerQt PUBLIC include)
 target_link_libraries(OccViewerQt PUBLIC
         Qt::Core
         Qt::Gui
         Qt::Widgets)
-target_link_libraries(OccViewerQt PUBLIC TKernel  TKMath  TKG2d  TKG3d  TKGeomBase  TKBRep  TKGeomAlgo  TKTopAlgo  TKPrim  TKBO  TKShHealing  TKBool  TKHLR  TKFillet  TKOffset  TKFeat  TKMesh  TKXMesh  TKService  TKV3d  TKOpenGl  TKMeshVS   TKCDF  TKLCAF  TKCAF  TKBinL  TKXmlL  TKBin  TKXml  TKStdL  TKStd  TKTObj  TKBinTObj  TKXmlTObj  TKVCAF  TKXDE  TKXSBase  TKSTEPBase  TKSTEPAttr  TKSTEP209  TKSTEP  TKIGES  TKXCAF  TKXDEIGES  TKXDESTEP  TKSTL  TKVRML  TKRWMesh  TKXmlXCAF  TKBinXCAF  TKXDECascade   )
-
+target_link_libraries(OccViewerQt PUBLIC TKernel TKMath TKG2d TKG3d TKGeomBase TKBRep TKGeomAlgo TKTopAlgo
+        TKPrim TKBO TKShHealing TKBool TKHLR TKFillet TKOffset TKFeat TKMesh TKXMesh TKService TKV3d
+        TKOpenGl TKMeshVS TKCDF TKLCAF TKCAF TKBinL TKXmlL TKBin TKXml TKStdL TKStd TKTObj
+        TKBinTObj TKXmlTObj TKVCAF TKXSBase TKXCAF TKRWMesh TKXmlXCAF TKBinXCAF)
 
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
