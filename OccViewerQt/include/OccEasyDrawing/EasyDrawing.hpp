@@ -19,7 +19,7 @@ namespace OccEasyDrawing
 
 	void DisplayObject(const ViewerHandles& handles, const AISObjects& objs);
 
-	void DisplayObject(const ViewerHandles& handles, Handle(AIS_InteractiveObject) obj);
+	void DisplayObject(const ViewerHandles& handles, const Handle(AIS_InteractiveObject)& obj);
 
 	void ApplyShapeRenderStyle(Handle(AIS_ColoredShape)& shape, const ShapeRenderStyle& style);
 
