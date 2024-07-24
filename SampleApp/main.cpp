@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        objs.push_back(new AIS_ColoredShape(make_wire.Shape()));
+        //objs.push_back(new AIS_ColoredShape(make_wire.Shape()));
     }
 
     BRepFill_Filling filling;
@@ -241,25 +241,11 @@ int main(int argc, char* argv[])
     }
     else
     {
-         objs.push_back(new AIS_ColoredShape(filling.Face()));
+         //objs.push_back(new AIS_ColoredShape(filling.Face()));
     }
 
-    BRepBuilderAPI_NurbsConvert nurbs(filling.Face());
-    Handle(Geom_Surface) geom_Extrusion = BRepLib_FindSurface(nurbs.Shape()).Surface();
-    Handle(Geom_BSplineSurface) geombspline_Extrusion = GeomConvert::SurfaceToBSplineSurface(geom_Extrusion);
-    objs.push_back(new AIS_ColoredShape(BRepBuilderAPI_MakeFace(geombspline_Extrusion, Precision::Confusion()).Shape()));
-    // print bspline surface info
-    std::cout << "bspline surface info:" << std::endl;
-    std::cout << "  nbUPoles: " << geombspline_Extrusion->NbUPoles() << std::endl;
-    std::cout << "  nbVPoles: " << geombspline_Extrusion->NbVPoles() << std::endl;
-    std::cout << "  nbUKnots: " << geombspline_Extrusion->NbUKnots() << std::endl;
-    std::cout << "  nbVKnots: " << geombspline_Extrusion->NbVKnots() << std::endl;
-    std::cout << "  uDegree: " << geombspline_Extrusion->UDegree() << std::endl;
-    std::cout << "  vDegree: " << geombspline_Extrusion->VDegree() << std::endl;
-    std::cout << "  uPeriodic: " << geombspline_Extrusion->IsUPeriodic() << std::endl;
-    std::cout << "  vPeriodic: " << geombspline_Extrusion->IsVPeriodic() << std::endl;
-    std::cout << "  uClosed: " << geombspline_Extrusion->IsUClosed() << std::endl;
-    std::cout << "  vClosed: " << geombspline_Extrusion->IsVClosed() << std::endl;
+    TopoDS_Shape nurbsFace = BRepBuilderAPI_NurbsConvert(filling.Face());
+    objs.push_back(new AIS_ColoredShape(nurbsFace));
 
     // TODO: GeomPlate_BuildPlateSurface
 
